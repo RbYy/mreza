@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+
+<head>
+{% load staticfiles %}    
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+<link rel="stylesheet" href='{% static "css/bootstrap-colorselector.css" %}'>
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+
+  <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <script src='{% static "js/bootstrap-colorselector.js" %}'></script>
+<style>
+aside { 
+    position:  absolute;
+    left: 0;
+    top: 0; /* set these so Chrome doesn't return 'auto' from getComputedStyle */
+    width: 200px; 
+    background: rgba(255,255,255,0.66); 
+    border: 1px  solid rgba(0,0,0,0.5); 
+    border-radius: 4px; padding: 8px;
+}
+td {
+    width: 25px;
+    height: 25px;
+}
+table {
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+</style>
+</head>
+
+<body>
+
+
+
+<div class="row">
+    <div class="tabela col-xs-8" id="mreza">
+        <table class="table-bordered table-condensed">
+
+            <tbody class='t'></tbody>
+            
+        </table>
+       
+    </div>
+    
+    <div id="desno" class="col-xs-4">
+        <form>
+         <label for="mre">dimenzije ozemlja</label><input type="text" class="form-control" name="mre" value="20x15" id="mre"/></p>
+         <button type="button" id="dimenzije" class="btn btn-primary">spremeni</button><br>
+         <br>
+         <h3>ustvari nov batiment</h3> 
+         <p><label foe="ime">naziv batimenta </label><input class="form-control" type="text" mane="ime", id="ime"><br>
+         <label>dimenzije batimenta </label><input class="form-control" type="text" name="velikost" value="3x4" id="velikost"/></p>
+         <select id="colorselector">
+            <option value="106" data-color="#A0522D"></option>
+            <option value="47" data-color="#CD5C5C" selected="selected"></option>
+            <option value="87" data-color="#FF4500"></option>
+
+            <option value="15" data-color="#DC143C"></option>
+            <option value="24" data-color="#FF8C00"></option>
+            <option value="78" data-color="#C71585"></option>
+        </select>
+         <p><button type="button" id="novbat" class="btn btn-primary">Ustvari</button></p>
+    </div>
+</div>
+    
+<script src='{% static "js/mreza.js" %}'></script>  
+
+</body>
+</html>
