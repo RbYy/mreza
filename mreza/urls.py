@@ -20,5 +20,9 @@ from mreza import views
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^mreza/', views.mreza, name='mreza'),
+    url(r'^shrani/', views.shrani, name='shrani'),
+    url(r'^ustvari_mrezo/', views.ustvari_mrezo, name='ustvari_mrezo'),
+    url(r'^povleci_mreze/', views.povleci_mreze, name='povleci_mreze'),
+    url(r'^odjava', views.odjava, name='odjava'),
     url(r'^accounts/', include('registration.backends.simple.urls')),
 ]

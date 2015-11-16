@@ -31,6 +31,7 @@ td {
     height: 25px;
 }
 table {
+    padding: 50px;
     border-collapse: collapse;
 }
 
@@ -48,6 +49,7 @@ table, th, td {
 <div class="row">
     <div class="tabela col-xs-8" id="mreza">
         <table class="table-bordered table-condensed">
+        <caption> mreža: {{ default_mreza.ime }}</caption>
 
             <tbody class='t'></tbody>
             
@@ -56,9 +58,13 @@ table, th, td {
     </div>
     
     <div id="desno" class="col-xs-4">
-        <form>
-         <label for="mre">dimenzije ozemlja</label><input type="text" class="form-control" name="mre" value="20x15" id="mre"/></p>
-         <button type="button" id="dimenzije" class="btn btn-primary">spremeni</button><br>
+        <p>{{ user }} :: <a href="{% url 'odjava' %}">odjava</a></p>
+        <form>{% csrf_token %}
+         <p>
+             <label for="mre">dimenzije ozemlja</label><input type="text" class="form-control" name="mre" value="20x15" id="mre"/>
+             <labet for="ime_mreze">ime ozemlja</label><input type="text" class="form-control" mane="ime_mreze" value="" id="ime_mreze"/>
+             <button type="button" id="dimenzije" class="btn btn-primary">spremeni</button><br>
+         </p>
          <br>
          <h3>ustvari nov batiment</h3> 
          <p><label foe="ime">naziv batimenta </label><input class="form-control" type="text" mane="ime", id="ime"><br>
@@ -76,7 +82,12 @@ table, th, td {
     </div>
 </div>
     
-<script src='{% static "js/mreza.js" %}'></script>  
-
+<script>
+    var sirina_default={{ default_mreza.sirina }}
+    var visina_default={{ default_mreza.visina }}
+    var user = {{ user }}
+    
+</script>  
+<script src='{% static "js/mreza.js" %}'></script>
 </body>
 </html>

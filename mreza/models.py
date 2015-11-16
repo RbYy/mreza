@@ -3,9 +3,12 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Mreza(models.Model):
+    ime = models.CharField(max_length=30)
+    datum = models.DateTimeField()
     sirina = models.IntegerField()
     visina = models.IntegerField()
-    uporanbik = models.ForeignKey(User)
+    aktivna = models.BooleanField()
+    uporabnik = models.ForeignKey(User)
 
 class Batiment(models.Model):
     visina_bat = models.IntegerField()
@@ -14,4 +17,7 @@ class Batiment(models.Model):
     ime = models.CharField(max_length=20)
     pozX = models.IntegerField()
     pozY = models.IntegerField()
+    mreza = models.ForeignKey(Mreza)
     
+class Stat(models.Model):
+    stevilo_ustvarjenih_batimentov = models.IntegerField();
