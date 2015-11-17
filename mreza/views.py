@@ -57,11 +57,13 @@ def povleci_mreze(request):
 def mreza(request):
     try:
         grid = Mreza.objects.get(aktivna=True)
+        vse_mreze=Mreza.objects.all()
         print('obstaja')
     except:
         pass
         #grid = Mreza.objects.create(sirina=25, visina=25, uporabnik=request.user)
-    return render(request, 'mreza/mreza.html', {'default_mreza':grid})
+    return render(request, 'mreza/mreza.html', {'default_mreza':grid,
+                                                'vse_mreze':vse_mreze})
 
 def shrani(request):
     offx=int(request.GET['offx'])
