@@ -15,10 +15,9 @@
 
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-
-  <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-  <script src='{% static "js/bootstrap-colorselector.js" %}'></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script src='{% static "js/bootstrap-colorselector.js" %}'></script>
 <style>
 aside { 
     position:  absolute;
@@ -44,6 +43,10 @@ table, th, td {
   body {
     padding-top: 10px; /* 60px to make the container go all the way to the bottom of the topbar */
 }
+
+label {
+    text-align: right;
+    }
 
 </style>
 </head>
@@ -86,7 +89,7 @@ table, th, td {
 
 
 <div class="row">
-    <div class="tabela col-xs-8" id="mreza">
+    <div class="tabela col-xs-7" id="mreza">
         <table class="table-bordered table-condensed">
         <caption> mreža: {{ default_mreza.ime }}</caption>
 
@@ -96,35 +99,62 @@ table, th, td {
        
     </div>
     
-    <div id="desno" class="col-xs-4">
-        <p>{{ user }} :: <a href="{% url 'odjava' %}">odjava</a></p>
-        <form>{% csrf_token %}
-         <p>
-             <label for="mre">dimenzije ozemlja</label><input type="text" class="form-control" name="mre" value="20x15" id="mre"/>
-             <labet for="ime_mreze">ime ozemlja</label><input type="text" class="form-control" mane="ime_mreze" value="" id="ime_mreze"/>
-             <button type="button" id="dimenzije" class="btn btn-primary">spremeni</button><br>
-         </p>
-         <br>
-         <h3>ustvari nov batiment</h3> 
-         <p><label foe="ime">naziv batimenta </label><input class="form-control" type="text" mane="ime", id="ime"><br>
-         <label>dimenzije batimenta </label><input class="form-control" type="text" name="velikost" value="3x4" id="velikost"/></p>
-         <select id="colorselector">
-            <option value="106" data-color="#A0522D"></option>
-            <option value="47" data-color="#CD5C5C" selected="selected"></option>
-            <option value="87" data-color="#FF4500"></option>
-
-            <option value="15" data-color="#DC143C"></option>
-            <option value="24" data-color="#FF8C00"></option>
-            <option value="78" data-color="#C71585"></option>
-        </select>
-         <p><button type="button" id="novbat" class="btn btn-primary">Ustvari</button></p>
+    <div id="desno" class="col-xs-5">
+        <div class="container">
+        <form class='form-horizontal' role='form'>{% csrf_token %}
+            <div class='row'>
+                <div class="col-xs-3"><label for="mre">dimenzije ozemlja</label></div>
+                <div class="col-xs-3"><input class="form-control" type="text"  name="mre" value="20x15" id="mre"/></div>
+                <div class="col-xs-2"><button type="button" id="dimenzije" class="btn btn-default ">spremeni</button></div>
+            </div><p></p>
+            <div class='row'>
+                <div class="col-xs-3"><label for="ime_mreze">ime ozemlja (shrani trenutno situacijo)</label></div>
+                <div class="col-xs-3"><input class="form-control" type="text"  mane="ime_mreze" value="" id="ime_mreze"/></div>
+                <div class="col-xs-2"><button type="button" id="shrani" class="btn btn-default">shrani</button></div>
+            </div><p></p>
+            
+            <div class='row'>
+                <div class="col-xs-3"><h4>ustvari nov batiment</h4></div>
+                <div class="col-xs-3"></div>
+                <div class="col-xs-3"></div>
+            </div><p></p>
+            
+            <div class='row'>
+                <div class="col-xs-3"><label for="ime">naziv batimenta </label></div>
+                <div class="col-xs-3"><input class="form-control" type="text" mane="ime" id="ime"></div>
+                <div class="col-xs-2"></div>
+            </div><p></p>
+            
+            <div class='row'>
+                <div class="col-xs-3"><label for="velikost">dimenzije batimenta </label></div>
+                <div class="col-xs-3"><input class="form-control" type="text" name="velikost" value="3x4" id="velikost"/></div>
+                <div class="col-xs-3">
+                    <select id="colorselector">
+                        <option value="106" data-color="#A0522D"></option>
+                        <option value="47" data-color="#CD5C5C" selected="selected"></option>
+                        <option value="87" data-color="#FF4500"></option>
+                        <option value="15" data-color="#DC143C"></option>
+                        <option value="24" data-color="#FF8C00"></option>
+                        <option value="78" data-color="#C71585"></option>
+                     </select>
+                 <button type="button" id="novbat" class=" gumb btn btn-default">Ustvari</button>
+                 </div><p></p>
+                </div>     
+           
+        </form>
+        </div>
     </div>
 </div>
     
 <script>
-    var sirina_default={{ default_mreza.sirina }}
-    var visina_default={{ default_mreza.visina }}
-    var user = {{ user }}
+
+
+
+    $('.form-group p').addClass('row');
+    var mreza_pk = {{ default_mreza.pk }};
+    var sirina_default={{ default_mreza.sirina }};
+    var visina_default={{ default_mreza.visina }};
+    var user = '{{ user }}';
     
 </script>  
 <script src='{% static "js/mreza.js" %}'></script>
