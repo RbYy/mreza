@@ -13,32 +13,59 @@ function povleciSeznamMrez(){
     });
 }
 function ustvariMrezo(){    
-    console.log(x,y);
-    $.get('/ustvari_mrezo/',{
-                            'sirina':x,
-                            'visina':y,
-                            'ime_mreze':ime_mreze},
-                            function(data){
-                                console.log('uspeh')
-                            })
+    console.log(x,y,ime_mreze);
+    if (ime_mreze !==null && x!==null && y!==null){
+        console.log('pravilni vnosi')
+        $.get('/ustvari_mrezo/',{
+                                'sirina':x,
+                                'visina':y,
+                                'ime_mreze':ime_mreze},
+                                function(data){
+                                    console.log('uspeh')
+                                })
+        }
+    else{
+        console.log('nepepolni vnosi')
+    }
 }
 
-function izrisiMrezo(sirina,visina){
+function izrisiMrezo(sirina,visina,ime){
+    $('.grid').remove();
+    $('caption').text(ime);
     for (var i=1; i<=visina; i++){
-        $('.t').append("<tr id=vrsta_" + i + "></tr>");
+        $('.t').append("<tr class='grid' id=vrsta_" + i + "></tr>");
         for (var j=1; j<=sirina; j++){
             $('#vrsta_'+ i).append('<td id=' + j + '_' + i +'></td>');
         }
     }
 }
-
+function shraniNoveDimenzijeMreze(){
+    $.get('/shrani_nove_dimenzije_mreze/',{
+                            'sirina':x,
+                            'visina':y,},
+                            function(data){
+                                console.log('shranjeno');
+                            });
+}
 povleciSeznamMrez();
-izrisiMrezo(sirina_default, visina_default);
+izrisiMrezo(sirina_default, visina_default, ime_default);
     
 $('#desno').on('click', '#dimenzije',function(){
+    shraniNoveDimenzijeMreze()
     $('tr').remove();
-    ustvariMrezo();
     izrisiMrezo(x,y);
+});
+$('#desno').on('click', '#shrani',function(){
+    ustvariMrezo();
+});
+
+$('.seznam_mrez').on('click','.mreza_v_seznamu', function(event){
+    pk=event.target.id.split('_')[1];
+    $.getJSON('/aktiviraj_drugo_mrezo/', {'pk':pk}, function(data){
+        izrisiMrezo(data[0].fields.sirina, data[0].fields.visina, data[0].fields.ime)
+        
+    });
+    console.log(pk, '... pk')
 });
 
 

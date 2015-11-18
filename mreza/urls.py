@@ -23,6 +23,8 @@ urlpatterns = [
     url(r'^shrani/', views.shrani, name='shrani'),
     url(r'^ustvari_mrezo/', views.ustvari_mrezo, name='ustvari_mrezo'),
     url(r'^povleci_mreze/', views.povleci_mreze, name='povleci_mreze'),
+    url(r'^shrani_nove_dimenzije_mreze/', views.shrani_nove_dimenzije_mreze, name='shrani_nove_dimenzije_mreze'),
     url(r'^odjava', views.odjava, name='odjava'),
+    url(r'^aktiviraj_drugo_mrezo/', views.aktiviraj_drugo_mrezo, name='aktiviraj_drugo_mrezo'),
     url(r'^accounts/', include('registration.backends.simple.urls')),
 ]

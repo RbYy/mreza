@@ -62,9 +62,9 @@ label {
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     moje mreze<b class="caret"></b>
                 </a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu seznam_mrez">
                     {% for mreza in vse_mreze %}
-                    <li><a id="{{mreza.ime}}">{{mreza.ime}}</a></li>
+                    <li class="mreza_v_seznamu"><a id="mreza_{{mreza.pk}}">{{mreza.ime}}</a></li>
                     {% endfor %}
                 </ul>
             </li>
@@ -154,6 +154,7 @@ label {
     var mreza_pk = {{ default_mreza.pk }};
     var sirina_default={{ default_mreza.sirina }};
     var visina_default={{ default_mreza.visina }};
+    var ime_default='{{ default_mreza.ime }}';
     var user = '{{ user }}';
     
 </script>  

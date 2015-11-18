@@ -21,7 +21,7 @@ def ustvari_mrezo(request):
                              int(request.GET['visina']),
                              request.user)
         try:
-            aktivna_mreza=Mreza.objects.get(aktivna=True)
+            aktivna_mreza=Mreza.objects.get(uporabnik=request.user, aktivna=True)
             print('najdena!!!!')
             aktivna_mreza.aktivna=False
             aktivna_mreza.save()
@@ -43,7 +43,7 @@ def ustvari_mrezo(request):
 def povleci_mreze(request):
     print('dddd')
     try:
-        vse_mreze = Mreza.objects.all()
+        vse_mreze = Mreza.objects.flter(uporabnik=request.user)
         print('do sem')
         data=serializers.serialize('json', vse_mreze)
         
@@ -56,14 +56,41 @@ def povleci_mreze(request):
 @login_required
 def mreza(request):
     try:
-        grid = Mreza.objects.get(aktivna=True)
-        vse_mreze=Mreza.objects.all()
+        grid = Mreza.objects.get(uporabnik=request.user, aktivna=True)
         print('obstaja')
     except:
-        pass
+        grid=Mreza.objects.create(ime='prva mreža',
+                                  datum=timezone.now(),
+                                  sirina=25,
+                                  visina=25,
+                                  aktivna=True,
+                                  uporabnik=request.user)
         #grid = Mreza.objects.create(sirina=25, visina=25, uporabnik=request.user)
+    vse_mreze=Mreza.objects.filter(uporabnik=request.user)    
     return render(request, 'mreza/mreza.html', {'default_mreza':grid,
                                                 'vse_mreze':vse_mreze})
+
+def shrani_nove_dimenzije_mreze(request):
+    mreza_za_updatat=Mreza.objects.get(uporabnik=request.user, aktivna=True)
+    mreza_za_updatat.sirina=request.GET['sirina']
+    mreza_za_updatat.visina=request.GET['visina']
+    mreza_za_updatat.save()
+    return HttpResponse('dd')
+    
+def aktiviraj_drugo_mrezo(request):
+    stara_aktivna=Mreza.objects.get(uporabnik=request.user, aktivna=True)
+    
+    stara_aktivna.aktivna=False
+    stara_aktivna.save()
+    nova_aktivna=Mreza.objects.get(pk=int(request.GET['pk']))
+    print('debug', nova_aktivna)
+    nova_aktivna.aktivna=True
+    nova_aktivna.save()
+    print('debug2')
+    data=serializers.serialize('json', [nova_aktivna,])
+    print('debug3')
+    return HttpResponse(data)
+    
 
 def shrani(request):
     offx=int(request.GET['offx'])
