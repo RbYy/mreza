@@ -3,3 +3,10 @@ __pycache__
 __pycache__/
 *idea/
 *.pyc
+*/bin/
+*/include/
+*/lib/
+.gitignore
+.project
+.pydevproject
+manage.py
