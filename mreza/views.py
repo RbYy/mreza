@@ -25,10 +25,8 @@ def ustvari_mrezo(request):
             print('najdena!!!!')
             aktivna_mreza.aktivna=False
             aktivna_mreza.save()
-        except:
-            print('kje je ')
-        
-        Mreza.objects.create(
+            print('do to je uredi')
+            ustvarjena_mreza = Mreza.objects.create(
                              ime=request.GET['ime_mreze'],
                              datum=timezone.now(),
                              sirina=int(request.GET['sirina']),
@@ -36,9 +34,15 @@ def ustvari_mrezo(request):
                              aktivna=True,
                              uporabnik=request.user,
                              )
+            
+        except:
+            print('kje je ')
+        
     except:
         print('napaka')
-    return HttpResponse('d')
+    print("pkpkpk", ustvarjena_mreza.pk)
+    return HttpResponse(ustvarjena_mreza.pk)
+
 @login_required
 def povleci_mreze(request):
     print('dddd')
@@ -70,13 +74,15 @@ def mreza(request):
     return render(request, 'mreza/mreza.html', {'default_mreza':grid,
                                                 'vse_mreze':vse_mreze})
 
+@login_required
 def shrani_nove_dimenzije_mreze(request):
     mreza_za_updatat=Mreza.objects.get(uporabnik=request.user, aktivna=True)
     mreza_za_updatat.sirina=request.GET['sirina']
     mreza_za_updatat.visina=request.GET['visina']
     mreza_za_updatat.save()
     return HttpResponse('dd')
-    
+
+@login_required
 def aktiviraj_drugo_mrezo(request):
     stara_aktivna=Mreza.objects.get(uporabnik=request.user, aktivna=True)
     
@@ -88,10 +94,10 @@ def aktiviraj_drugo_mrezo(request):
     nova_aktivna.save()
     print('debug2')
     data=serializers.serialize('json', [nova_aktivna,])
-    print('debug3')
+    print('debug3', data)
     return HttpResponse(data)
     
-
+@login_required
 def shrani(request):
     offx=int(request.GET['offx'])
     offy=int(request.GET['offy'])
