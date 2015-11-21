@@ -57,6 +57,16 @@ def povleci_mreze(request):
     print(data)
     return HttpResponse(data)
 
+
+
+@login_required
+def shrani_nove_dimenzije_mreze(request):
+    mreza_za_updatat=Mreza.objects.get(uporabnik=request.user, aktivna=True)
+    mreza_za_updatat.sirina=request.GET['sirina']
+    mreza_za_updatat.visina=request.GET['visina']
+    mreza_za_updatat.save()
+    return HttpResponse('dd')
+
 @login_required
 def mreza(request):
     try:
@@ -73,15 +83,7 @@ def mreza(request):
     vse_mreze=Mreza.objects.filter(uporabnik=request.user)    
     return render(request, 'mreza/mreza.html', {'default_mreza':grid,
                                                 'vse_mreze':vse_mreze})
-
-@login_required
-def shrani_nove_dimenzije_mreze(request):
-    mreza_za_updatat=Mreza.objects.get(uporabnik=request.user, aktivna=True)
-    mreza_za_updatat.sirina=request.GET['sirina']
-    mreza_za_updatat.visina=request.GET['visina']
-    mreza_za_updatat.save()
-    return HttpResponse('dd')
-
+    
 @login_required
 def aktiviraj_drugo_mrezo(request):
     stara_aktivna=Mreza.objects.get(uporabnik=request.user, aktivna=True)
@@ -90,12 +92,17 @@ def aktiviraj_drugo_mrezo(request):
     nova_aktivna=Mreza.objects.get(pk=int(request.GET['pk']))
     nova_aktivna.aktivna=True
     nova_aktivna.save()
-    batimenti_na_mrezi = Batiment.objects.filter(mreza=nova_aktivna)
-   
+    return poslji_komplet(request)
+    
+def poslji_komplet(request): #poslje mrezo izpolnjeno z batimenti
+    print('ssss')
+    aktivna_mreza=Mreza.objects.get(uporabnik=request.user, aktivna=True)
+    batimenti_na_mrezi = Batiment.objects.filter(mreza=aktivna_mreza)
     batimenti_json=serializers.serialize('json', batimenti_na_mrezi)
-    mreza_json=serializers.serialize('json', [nova_aktivna,])
+    mreza_json=serializers.serialize('json', [aktivna_mreza,])
     batimenti_json_odkodirano=json.loads(batimenti_json)
     mreza_json_odkodirano=json.loads(mreza_json)
+    print('wertzui')
     i=0
     for bat in batimenti_na_mrezi:
         pozx=Koordinate.objects.filter(batiment=bat).order_by('-id')[0].x

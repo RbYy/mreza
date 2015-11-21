@@ -19,7 +19,6 @@ function ustvariMrezo(x,y,ime_mreze){
     /* posodobi caption*/
     console.log(x,y,ime_mreze); 
     if (ime_mreze !==null && x!==null && y!==null){
-        console.log('pravilni vnosi')
         ime_mreze=$('#ime_mreze').val();
         $.get('/ustvari_mrezo/',{
                                 'sirina':x,
@@ -27,7 +26,6 @@ function ustvariMrezo(x,y,ime_mreze){
                                 'ime_mreze':ime_mreze},
                                 function(pk){
                                     aktivna = pk;
-                                    console.log('uspeh');
                                     $('.seznam_mrez').append('<li class="mreza_v_seznamu"><a id="mreza_'+ pk +'">'+ ime_mreze +'</a></li>');
                                     $('caption').text(ime_mreze+'  '+x+'x'+y);
                                 })
@@ -41,7 +39,6 @@ function izrisiMrezo(sirina,visina,ime){
     /*samo graficno izrise mrezo; tudi caption*/
     $('.grid').remove();
     $('caption').text(ime+'  '+sirina+'x'+visina);
-    console.log('sirina: '+sirina+'; visina: '+visina+'; ime: '+ime);
     for (var i=1; i<=visina; i++){
         $('.t').append("<tr class='grid' id=vrsta_" + i + "></tr>");
         for (var j=1; j<=sirina; j++){
@@ -56,19 +53,15 @@ function shraniNoveDimenzijeMreze(x,y){
                             'sirina':x,
                             'visina':y,},
                             function(data){
-                                console.log('shranjeno');
                             });
 }
-
 
 
 function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
      var batiment_id=data;
      sirina=parseInt(sirina);
      visina=parseInt(visina);
-     console.log(sirina, visina);
      barva="orange";
-     console.log(data);
      $('table').append('<div class=" lik ' + vrsta + '" id="lik'+ batiment_id + '"><p class="zapri" name="'+ batiment_id +'" id ="zapri">X</p><p id="naslov_'+ batiment_id +'" class="naslov"></p></div>');
          $( ".lik" ).draggable({
                      stop: function( event, ui ) {
@@ -84,8 +77,6 @@ function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
                                              'offy': oy,
                                              'id': batiment_id}, 
                                              function(data){
-                                                 console.log(ox + ' == '+ oy +' == '+offx+'--'+offy);
-                                                console.log('shranjujem nove koordinate '+data) 
                                              });
                                              }
          });
@@ -114,19 +105,34 @@ function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
            
      
      $('.lik').on('click', '.zapri', function(event){
-             console.log('event');
+
               id=$(this).attr("name");
               $("#lik"+id).remove();
               $.get('/zbrisi_batiment/', {'id': id},
                                      function(data){
-                                     console.log(data)
                                  });
       });
 }                         
-                         
+       
+function izrisiZacetnoStanje(){                         
+    $.getJSON('/poslji_komplet/', {}, function(data){
+        barva="orange";
+        izrisiMrezo(data[0].fields.sirina, data[0].fields.visina, data[0].fields.ime);
+        jQuery.each(data.slice(2), function(i, val) {
+            args=val.fields;
+            izrisi_batiment(val.pk, 
+                            args.sirina_bat, 
+                            args.visina_bat, 
+                            args.pozx, 
+                            args.pozy, 
+                            args.ime, 
+                            args.vrsta, 
+                            barva);         
+        }); 
+    });
+}    
 
-
-izrisiMrezo(sirina_default, visina_default, ime_default);
+izrisiZacetnoStanje();
 
     
 $('#desno').on('click', '#dimenzije',function(){
@@ -153,11 +159,8 @@ $('.seznam_mrez').on('click','.mreza_v_seznamu', function(event){
     aktivna=pk
     $.getJSON('/aktiviraj_drugo_mrezo/', {'pk':pk}, function(data){
         izrisiMrezo(data[0].fields.sirina, data[0].fields.visina, data[0].fields.ime);
-        ime_mreze=data[0].fields.ime;
         jQuery.each(data.slice(2), function(i, val) {
             args=val['fields'];
-            console.log('višina: '+args.visina_bat+'  sirina: '+args.sirina_bat);
-            console.log('zzz'+data[0].pk);
             izrisi_batiment(val['pk'], 
                             args.sirina_bat, 
                             args.visina_bat, 
@@ -190,7 +193,6 @@ $('#desno').on('click', '#novbat',function(){
                     function(data){
                         izrisi_batiment(data, xx, yy, zacetni_offset_x, zacetni_offset_y, ime, vrsta, barva)
                     });
-    $('form')[0].reset();
 });
 
-  console.log('dsf')
+

@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^shrani_nove_koordinate_batimenta/', shrani_nove_koordinate_batimenta, name='shrani_nove_koordinate_batimenta'),
     url(r'^ustvari_mrezo/', views.ustvari_mrezo, name='ustvari_mrezo'),
     url(r'^povleci_mreze/', views.povleci_mreze, name='povleci_mreze'),
+    url(r'^poslji_komplet/', views.poslji_komplet, name='poslji_komplet'),
     url(r'^shrani_nove_dimenzije_mreze/', views.shrani_nove_dimenzije_mreze, name='shrani_nove_dimenzije_mreze'),
     url(r'^odjava', views.odjava, name='odjava'),
     url(r'^aktiviraj_drugo_mrezo/', views.aktiviraj_drugo_mrezo, name='aktiviraj_drugo_mrezo'),
