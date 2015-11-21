@@ -93,9 +93,19 @@ def aktiviraj_drugo_mrezo(request):
     batimenti_na_mrezi = Batiment.objects.filter(mreza=nova_aktivna)
    
     data1=serializers.serialize('json', batimenti_na_mrezi)
-    kor=[Koordinate.objects.filter(batiment=bat).order_by('-id')[0] for bat in batimenti_na_mrezi]
-    data = serializers.serialize('json', kor)
-    print(data)
+    data1_odkodirano=json.loads(data1)
+    i=0
+    for bat in batimenti_na_mrezi:
+
+        pozx=Koordinate.objects.filter(batiment=bat).order_by('-id')[0].x
+        pozy=Koordinate.objects.filter(batiment=bat).order_by('-id')[0].y 
+        data1_odkodirano[i]['fields']['pozx']=pozx
+        data1_odkodirano[i]['fields']['pozy']=pozy
+        i+=1
+        print('dddoootttooo')
+        
+    #data = serializers.serialize('json', kor)
+    print(data1_odkodirano)
     data=serializers.serialize('json', [nova_aktivna,])
     
     #print(data1)
