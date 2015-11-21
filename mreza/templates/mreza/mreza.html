@@ -89,6 +89,7 @@ label {
 
 
 <div class="row">
+    <div class="container"></div>
     <div class="tabela col-xs-7" id="mreza">
         <table class="table-bordered table-condensed">
         <caption> mreža: {{ default_mreza.ime }}</caption>
@@ -103,32 +104,32 @@ label {
         <div class="container">
         <form class='form-horizontal' role='form'>{% csrf_token %}
             <div class='row'>
-                <div class="col-xs-3"><label for="mre">dimenzije ozemlja</label></div>
-                <div class="col-xs-3"><input class="form-control" type="text"  name="mre" value="20x15" id="mre"/></div>
-                <div class="col-xs-2"><button type="button" id="dimenzije" class="btn btn-default ">spremeni</button></div>
+                <div class="col-xs-2"><label for="mre">dimenzije ozemlja</label></div>
+                <div class="col-xs-2"><input class="form-control" type="text"  name="mre" value="20x15" id="mre"/></div>
+                <div class="col-xs-1"><button type="button" id="dimenzije" class="btn btn-default ">spremeni</button></div>
             </div><p></p>
             <div class='row'>
-                <div class="col-xs-3"><label for="ime_mreze">ime ozemlja (shrani trenutno situacijo)</label></div>
-                <div class="col-xs-3"><input class="form-control" type="text"  mane="ime_mreze" value="" id="ime_mreze"/></div>
-                <div class="col-xs-2"><button type="button" id="shrani" class="btn btn-default">shrani</button></div>
-            </div><p></p>
-            
-            <div class='row'>
-                <div class="col-xs-3"><h4>ustvari nov batiment</h4></div>
-                <div class="col-xs-3"></div>
-                <div class="col-xs-3"></div>
+                <div class="col-xs-2"><label for="ime_mreze">ime ozemlja (shrani trenutno situacijo)</label></div>
+                <div class="col-xs-2"><input class="form-control" type="text"  mane="ime_mreze" value="" id="ime_mreze"/></div>
+                <div class="col-xs-1"><button type="button" id="shrani" class="btn btn-default">shrani</button></div>
             </div><p></p>
             
             <div class='row'>
-                <div class="col-xs-3"><label for="ime">naziv batimenta </label></div>
-                <div class="col-xs-3"><input class="form-control" type="text" mane="ime" id="ime"></div>
+                <div class="col-xs-2"><h4>ustvari nov batiment</h4></div>
                 <div class="col-xs-2"></div>
+                <div class="col-xs-1"></div>
             </div><p></p>
             
             <div class='row'>
-                <div class="col-xs-3"><label for="velikost">dimenzije batimenta </label></div>
-                <div class="col-xs-3"><input class="form-control" type="text" name="velikost" value="3x4" id="velikost"/></div>
-                <div class="col-xs-3">
+                <div class="col-xs-2"><label for="ime">naziv batimenta </label></div>
+                <div class="col-xs-2"><input class="form-control" type="text" mane="ime" id="ime"></div>
+                <div class="col-xs-1"></div>
+            </div><p></p>
+            
+            <div class='row'>
+                <div class="col-xs-2"><label for="velikost">dimenzije batimenta </label></div>
+                <div class="col-xs-2"><input class="form-control" type="text" name="velikost" value="3x4" id="velikost"/></div>
+                <div class="col-xs-1">
                     <select id="colorselector">
                         <option value="106" data-color="#A0522D"></option>
                         <option value="47" data-color="#CD5C5C" selected="selected"></option>
@@ -152,9 +153,10 @@ label {
 
     $('.form-group p').addClass('row');
     var mreza_pk = {{ default_mreza.pk }};
-    var sirina_default={{ default_mreza.sirina }};
-    var visina_default={{ default_mreza.visina }};
-    var ime_default='{{ default_mreza.ime }}';
+    var sirina_default = {{ default_mreza.sirina }};
+    var visina_default = {{ default_mreza.visina }};
+    var ime_default = '{{ default_mreza.ime }}';
+    var pk_default = {{ default_mreza.pk }}
     var user = '{{ user }}';
     
 </script>  

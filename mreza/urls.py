@@ -16,11 +16,14 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from mreza import views
+from mreza.views import shrani_nove_koordinate_batimenta
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^mreza/', views.mreza, name='mreza'),
-    url(r'^shrani/', views.shrani, name='shrani'),
+    url(r'^ustvari_batiment/', views.ustvari_batiment, name='ustvari_batiment'),
+    url(r'^zbrisi_batiment/', views.zbrisi_batiment, name='zbrisi_batiment'),
+    url(r'^shrani_nove_koordinate_batimenta/', shrani_nove_koordinate_batimenta, name='shrani_nove_koordinate_batimenta'),
     url(r'^ustvari_mrezo/', views.ustvari_mrezo, name='ustvari_mrezo'),
     url(r'^povleci_mreze/', views.povleci_mreze, name='povleci_mreze'),
     url(r'^shrani_nove_dimenzije_mreze/', views.shrani_nove_dimenzije_mreze, name='shrani_nove_dimenzije_mreze'),

@@ -85,30 +85,56 @@ def shrani_nove_dimenzije_mreze(request):
 @login_required
 def aktiviraj_drugo_mrezo(request):
     stara_aktivna=Mreza.objects.get(uporabnik=request.user, aktivna=True)
-    
     stara_aktivna.aktivna=False
     stara_aktivna.save()
     nova_aktivna=Mreza.objects.get(pk=int(request.GET['pk']))
-    print('debug', nova_aktivna)
     nova_aktivna.aktivna=True
     nova_aktivna.save()
-    print('debug2')
+    batimenti_na_mrezi = Batiment.objects.filter(mreza=nova_aktivna)
+   
+    data1=serializers.serialize('json', batimenti_na_mrezi)
+    kor=[Koordinate.objects.filter(batiment=bat).order_by('-id')[0] for bat in batimenti_na_mrezi]
+    data = serializers.serialize('json', kor)
+    print(data)
     data=serializers.serialize('json', [nova_aktivna,])
-    print('debug3', data)
+    
+    #print(data1)
     return HttpResponse(data)
     
 @login_required
-def shrani(request):
-    offx=int(request.GET['offx'])
-    offy=int(request.GET['offy'])
-    visina=int(request.GET['visina'])
-    sirina=int(request.GET['sirina'])
-    barva=request.GET['barva']
-    ime=request.GET['ime']
-    vrsta=request.GET['vrsta']
+def ustvari_batiment(request):
+    novi_batiment=Batiment.objects.create(visina_bat=int(request.GET['visina']),
+                            sirina_bat=int(request.GET['sirina']),
+                            vrsta=request.GET['vrsta'],
+                            ime=request.GET['ime'],
+                            mreza=Mreza.objects.get(aktivna=True))
+    print('do to')
+    Koordinate.objects.create(
+                              x=int(request.GET['offx']),
+                              y=int(request.GET['offy']),
+                              batiment=novi_batiment)
+    print(Batiment.objects.all())
+    
+    
+    print('----------------')
+    print(Koordinate.objects.all())
+    print(novi_batiment.id)
+    return HttpResponse(str(novi_batiment.id))
 
-    return HttpResponse("d")
+@login_required
+def zbrisi_batiment(request):
+    print('vsaj pride notr')
+    batiment_za_zbrisat = Batiment.objects.get(id=int(request.GET['id']))
+    print(batiment_za_zbrisat.ime)
+    batiment_za_zbrisat.delete()
+    print(Batiment.objects.all().count())
+    return HttpResponse('batiment zbrisan')
 
+def shrani_nove_koordinate_batimenta(request):
+    batiment=Batiment.objects.get(id=request.GET['id'])
+    kor=Koordinate.objects.create(x=request.GET['offx'], y=request.GET['offy'], batiment=batiment)
+    return HttpResponse(kor.x)
+    
 @login_required
 def odjava(*args, **kwargs):
     logout(args[0])

@@ -15,9 +15,10 @@ class Batiment(models.Model):
     sirina_bat = models.IntegerField()
     vrsta = models.CharField(max_length=30)
     ime = models.CharField(max_length=20)
-    pozX = models.IntegerField()
-    pozY = models.IntegerField()
     mreza = models.ForeignKey(Mreza)
     
-class Stat(models.Model):
-    stevilo_ustvarjenih_batimentov = models.IntegerField();
+class Koordinate(models.Model):
+    x = models.IntegerField()
+    y = models.IntegerField()
+    batiment = models.ForeignKey(Batiment)
+    
