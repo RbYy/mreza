@@ -92,24 +92,23 @@ def aktiviraj_drugo_mrezo(request):
     nova_aktivna.save()
     batimenti_na_mrezi = Batiment.objects.filter(mreza=nova_aktivna)
    
-    data1=serializers.serialize('json', batimenti_na_mrezi)
-    data1_odkodirano=json.loads(data1)
+    batimenti_json=serializers.serialize('json', batimenti_na_mrezi)
+    mreza_json=serializers.serialize('json', [nova_aktivna,])
+    batimenti_json_odkodirano=json.loads(batimenti_json)
+    mreza_json_odkodirano=json.loads(mreza_json)
     i=0
     for bat in batimenti_na_mrezi:
-
         pozx=Koordinate.objects.filter(batiment=bat).order_by('-id')[0].x
         pozy=Koordinate.objects.filter(batiment=bat).order_by('-id')[0].y 
-        data1_odkodirano[i]['fields']['pozx']=pozx
-        data1_odkodirano[i]['fields']['pozy']=pozy
+        batimenti_json_odkodirano[i]['fields']['pozx']=pozx
+        batimenti_json_odkodirano[i]['fields']['pozy']=pozy
         i+=1
-        print('dddoootttooo')
-        
-    #data = serializers.serialize('json', kor)
-    print(data1_odkodirano)
-    data=serializers.serialize('json', [nova_aktivna,])
-    
-    #print(data1)
-    return HttpResponse(data)
+   
+    mreza_z_batimenti=mreza_json_odkodirano+batimenti_json_odkodirano
+
+    mreza_z_batimenti_json=json.dumps(mreza_z_batimenti, cls=DjangoJSONEncoder)
+    print(mreza_z_batimenti_json)
+    return HttpResponse(mreza_z_batimenti_json)
     
 @login_required
 def ustvari_batiment(request):
@@ -141,8 +140,9 @@ def zbrisi_batiment(request):
     return HttpResponse('batiment zbrisan')
 
 def shrani_nove_koordinate_batimenta(request):
-    batiment=Batiment.objects.get(id=request.GET['id'])
-    kor=Koordinate.objects.create(x=request.GET['offx'], y=request.GET['offy'], batiment=batiment)
+    tbatiment=Batiment.objects.get(id=request.GET['id'])
+    print('kooor')
+    kor=Koordinate.objects.create(x=int(request.GET['offx']), y=int(request.GET['offy']), batiment=tbatiment)
     return HttpResponse(kor.x)
     
 @login_required

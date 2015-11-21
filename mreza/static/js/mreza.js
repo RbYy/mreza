@@ -15,6 +15,8 @@ function povleciSeznamMrez(){
 }
 
 function ustvariMrezo(x,y,ime_mreze){    
+    /*ne izrisuje mreze; ustvari novo v bazi in doda na seznam*/
+    /* posodobi caption*/
     console.log(x,y,ime_mreze); 
     if (ime_mreze !==null && x!==null && y!==null){
         console.log('pravilni vnosi')
@@ -27,6 +29,7 @@ function ustvariMrezo(x,y,ime_mreze){
                                     aktivna = pk;
                                     console.log('uspeh');
                                     $('.seznam_mrez').append('<li class="mreza_v_seznamu"><a id="mreza_'+ pk +'">'+ ime_mreze +'</a></li>');
+                                    $('caption').text(ime_mreze+'  '+x+'x'+y);
                                 })
         }
     else{
@@ -35,6 +38,7 @@ function ustvariMrezo(x,y,ime_mreze){
 }
 
 function izrisiMrezo(sirina,visina,ime){
+    /*samo graficno izrise mrezo; tudi caption*/
     $('.grid').remove();
     $('caption').text(ime+'  '+sirina+'x'+visina);
     console.log('sirina: '+sirina+'; visina: '+visina+'; ime: '+ime);
@@ -47,6 +51,7 @@ function izrisiMrezo(sirina,visina,ime){
 }
 
 function shraniNoveDimenzijeMreze(x,y){
+    /*ne preminja videza strani*/
     $.get('/shrani_nove_dimenzije_mreze/',{
                             'sirina':x,
                             'visina':y,},
@@ -54,35 +59,15 @@ function shraniNoveDimenzijeMreze(x,y){
                                 console.log('shranjeno');
                             });
 }
-/*povleciSeznamMrez();*/
-izrisiMrezo(sirina_default, visina_default, ime_default);
 
-    
-$('#desno').on('click', '#dimenzije',function(){
-    x=parseInt($('#mre').val().split('x')[0]);
-    y=parseInt($('#mre').val().split('x')[1]);
-    izrisiMrezo(x,y,ime_mreze);
-    shraniNoveDimenzijeMreze(x,y);
 
-});
-$('#desno').on('click', '#shrani',function(){
-    
-    ustvariMrezo(x, y, ime_mreze);
-});
-
-$('.seznam_mrez').on('click','.mreza_v_seznamu', function(event){
-    pk=event.target.id.split('_')[1];
-    aktivna=pk
-    $.getJSON('/aktiviraj_drugo_mrezo/', {'pk':pk}, function(data){
-        izrisiMrezo(data[0].fields.sirina, data[0].fields.visina, data[0].fields.ime);
-        ime_mreze=data[0].fields.ime;
-        
-    });
-    console.log(pk, '... pk')
-});
 
 function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
      var batiment_id=data;
+     sirina=parseInt(sirina);
+     visina=parseInt(visina);
+     console.log(sirina, visina);
+     barva="orange";
      console.log(data);
      $('table').append('<div class=" lik ' + vrsta + '" id="lik'+ batiment_id + '"><p class="zapri" name="'+ batiment_id +'" id ="zapri">X</p><p id="naslov_'+ batiment_id +'" class="naslov"></p></div>');
          $( ".lik" ).draggable({
@@ -116,11 +101,6 @@ function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
                  "height":visina*25} 
                  );
      $("#naslov_"+batiment_id).text(ime);
-     var offset=$('#lik'+batiment_id).offset();
-     console.log(offset);                        
-    
-    
-    
     
      $(function() {
          $( ".lik" ).draggable({
@@ -144,6 +124,51 @@ function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
       });
 }                         
                          
+
+
+izrisiMrezo(sirina_default, visina_default, ime_default);
+
+    
+$('#desno').on('click', '#dimenzije',function(){
+    /*klik na gumb za potrditev spremembe dimenzije mreze*/
+    x=parseInt($('#mre').val().split('x')[0]);
+    y=parseInt($('#mre').val().split('x')[1]);
+    izrisiMrezo(x,y,ime_mreze);
+    shraniNoveDimenzijeMreze(x,y);
+    $('form')[0].reset();
+
+});
+$('#desno').on('click', '#shrani',function(){
+    /*klik na gumb za shranjevanje trenutne mreze in postavitve*/    
+    ustvariMrezo(x, y, ime_mreze);
+    $('form')[0].reset();
+
+});
+
+$('.seznam_mrez').on('click','.mreza_v_seznamu', function(event){
+    /* preklapljanje med shranjenimi mrezammi */
+    $('.lik').remove();
+    pk=event.target.id.split('_')[1];
+    barva="orange";
+    aktivna=pk
+    $.getJSON('/aktiviraj_drugo_mrezo/', {'pk':pk}, function(data){
+        izrisiMrezo(data[0].fields.sirina, data[0].fields.visina, data[0].fields.ime);
+        ime_mreze=data[0].fields.ime;
+        jQuery.each(data.slice(2), function(i, val) {
+            args=val['fields'];
+            console.log('višina: '+args.visina_bat+'  sirina: '+args.sirina_bat);
+            console.log('zzz'+data[0].pk);
+            izrisi_batiment(val['pk'], 
+                            args.sirina_bat, 
+                            args.visina_bat, 
+                            args.pozx, 
+                            args.pozy, 
+                            args.ime, 
+                            args.vrsta, 
+                            barva);         
+        }); 
+    });
+});
                          
 $('#desno').on('click', '#novbat',function(){
     var barva=$(".btn-colorselector").css("background-color");
@@ -165,6 +190,7 @@ $('#desno').on('click', '#novbat',function(){
                     function(data){
                         izrisi_batiment(data, xx, yy, zacetni_offset_x, zacetni_offset_y, ime, vrsta, barva)
                     });
+    $('form')[0].reset();
 });
 
   console.log('dsf')
