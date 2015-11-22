@@ -136,18 +136,20 @@ def ustvari_batiment(request):
     print('----------------')
     print(Koordinate.objects.all())
     print(novi_batiment.id)
-    return HttpResponse(str(novi_batiment.id))
+    return HttpResponse(str(novi_batiment.pk))
 
 @login_required
 def zbrisi_batiment(request):
     print('vsaj pride notr')
     batiment_za_zbrisat = Batiment.objects.get(id=int(request.GET['id']))
-    print(batiment_za_zbrisat.ime)
+    print("nrdi še enu vrsticu")
+    #print(batiment_za_zbrisat.ime)
     batiment_za_zbrisat.delete()
     print(Batiment.objects.all().count())
     return HttpResponse('batiment zbrisan')
 
 def shrani_nove_koordinate_batimenta(request):
+    print("tudi to so težave")
     tbatiment=Batiment.objects.get(id=request.GET['id'])
     print('kooor')
     kor=Koordinate.objects.create(x=int(request.GET['offx']), y=int(request.GET['offy']), batiment=tbatiment)

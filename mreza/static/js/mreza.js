@@ -110,6 +110,7 @@ function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
               $("#lik"+id).remove();
               $.get('/zbrisi_batiment/', {'id': id},
                                      function(data){
+                                        console.log(data);
                                  });
       });
 }                         
