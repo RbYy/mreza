@@ -28,6 +28,9 @@ aside {
     border: 1px  solid rgba(0,0,0,0.5); 
     border-radius: 4px; padding: 8px;
 }
+.lik {
+    border: 1px  solid rgba(255,255,255,0.5); 
+}
 td {
     width: 25px;
     height: 25px;
@@ -40,7 +43,7 @@ table {
 table, th, td {
     border: 1px solid black;
 }
-  body {
+body {
     padding-top: 10px; /* 60px to make the container go all the way to the bottom of the topbar */
 }
 
@@ -87,11 +90,10 @@ label {
     </div>
 </nav>
 
-
+<div class="fluid-container">
 <div class="row">
-    <div class="container"></div>
-    <div class="tabela col-xs-7" id="mreza">
-        <table class="table-bordered table-condensed">
+    <div class="tabela col-xs-9" id="mreza">
+        <table class="table-bordered">
         <caption> mreža: {{ default_mreza.ime }}</caption>
 
             <tbody class='t'></tbody>
@@ -100,36 +102,35 @@ label {
        
     </div>
     
-    <div id="desno" class="col-xs-5">
-        <div class="container">
+    <div id="desno" class="col-xs-3">
         <form class='form-horizontal' role='form'>{% csrf_token %}
-            <div class='row'>
-                <div class="col-xs-2"><label for="mre">dimenzije ozemlja</label></div>
-                <div class="col-xs-2"><input class="form-control" type="text"  name="mre" value="" placeholder="e.g. 20x15" id="mre"/></div>
-                <div class="col-xs-1"><button type="button" id="dimenzije" class="btn btn-default ">spremeni</button></div>
+            <div>
+                <div ><label for="mre">dimenzije ozemlja</label></div>
+                <div><input class="form-control" type="text"  name="mre" value="" placeholder="e.g. 20x15" id="mre"/></div>
+                <div><button type="button" id="dimenzije" class="btn btn-default ">spremeni</button></div>
             </div><p></p>
-            <div class='row'>
-                <div class="col-xs-2"><label for="ime_mreze">ime ozemlja (shrani trenutno situacijo)</label></div>
-                <div class="col-xs-2"><input class="form-control" type="text"  mane="ime_mreze" value="" id="ime_mreze"/></div>
-                <div class="col-xs-1"><button type="button" id="shrani" class="btn btn-default">shrani</button></div>
-            </div><p></p>
-            
-            <div class='row'>
-                <div class="col-xs-2"><h4>ustvari nov batiment</h4></div>
-                <div class="col-xs-2"></div>
-                <div class="col-xs-1"></div>
+            <div>
+                <div><label for="ime_mreze">ime ozemlja (shrani trenutno situacijo)</label></div>
+                <div><input class="form-control" type="text"  mane="ime_mreze" value="" id="ime_mreze"/></div>
+                <div><button type="button" id="shrani" class="btn btn-default">shrani</button></div>
             </div><p></p>
             
-            <div class='row'>
-                <div class="col-xs-2"><label for="ime">naziv batimenta </label></div>
-                <div class="col-xs-2"><input class="form-control" type="text" mane="ime" id="ime"></div>
-                <div class="col-xs-1"></div>
+            <div>
+                <div><h4>ustvari nov batiment</h4></div>
+                <div></div>
+                <div></div>
             </div><p></p>
             
-            <div class='row'>
-                <div class="col-xs-2"><label for="velikost">dimenzije batimenta </label></div>
-                <div class="col-xs-2"><input class="form-control" type="text" name="velikost" value="" placeholder="e.g. 3x4" id="velikost"/></div>
-                <div class="col-xs-1">
+            <div>
+                <div><label for="ime">naziv batimenta </label></div>
+                <div><input class="form-control" type="text" mane="ime" id="ime"></div>
+                <div></div>
+            </div><p></p>
+            
+            <div>
+                <div><label for="velikost">dimenzije batimenta </label></div>
+                <div><input class="form-control" type="text" name="velikost" value="" placeholder="e.g. 3x4" id="velikost"/></div>
+                <div>
                     <select id="colorselector">
                         <option value="106" data-color="#A0522D"></option>
                         <option value="47" data-color="#CD5C5C" selected="selected"></option>
@@ -143,9 +144,10 @@ label {
                 </div>     
            
         </form>
-        </div>
-    </div>
-</div>
+
+    </div> <!-- desno -->
+</div> <!-- row -->
+</div> <!-- container -->
     
 <script>
 

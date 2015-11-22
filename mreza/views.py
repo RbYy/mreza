@@ -73,7 +73,7 @@ def mreza(request):
         grid = Mreza.objects.get(uporabnik=request.user, aktivna=True)
         print('obstaja')
     except:
-        grid=Mreza.objects.create(ime='prva mreža',
+        grid=Mreza.objects.create(ime='prva mreza',
                                   datum=timezone.now(),
                                   sirina=25,
                                   visina=25,
@@ -119,11 +119,12 @@ def poslji_komplet(request): #poslje mrezo izpolnjeno z batimenti
     
 @login_required
 def ustvari_batiment(request):
+    print('je prslo notr')
     novi_batiment=Batiment.objects.create(visina_bat=int(request.GET['visina']),
                             sirina_bat=int(request.GET['sirina']),
                             vrsta=request.GET['vrsta'],
                             ime=request.GET['ime'],
-                            mreza=Mreza.objects.get(aktivna=True))
+                            mreza=Mreza.objects.get(uporabnik=request.user, aktivna=True))
     print('do to')
     Koordinate.objects.create(
                               x=int(request.GET['offx']),

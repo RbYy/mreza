@@ -5,19 +5,9 @@ var y=parseInt($('#mre').val().split('x')[1]);
 var ime_mreze=$('#ime_mreze').val();
 var aktivna=pk_default;
 
-function povleciSeznamMrez(){
-    $.getJSON('/povleci_mreze/', {}, function(data){
-        for (i=1; i<data.length+1; i++){
-            console.log(data[i-1]['fields']['datum']);
-        }
-        console.log(data);
-    });
-}
-
 function ustvariMrezo(x,y,ime_mreze){    
     /*ne izrisuje mreze; ustvari novo v bazi in doda na seznam*/
     /* posodobi caption*/
-    console.log(x,y,ime_mreze); 
     if (ime_mreze !==null && x!==null && y!==null){
         ime_mreze=$('#ime_mreze').val();
         $.get('/ustvari_mrezo/',{
@@ -89,7 +79,7 @@ function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
                  "left": x,
                  "top": y,
                  "width":sirina*25, 
-                 "height":visina*25} 
+                 "height":visina*25,} 
                  );
      $("#naslov_"+batiment_id).text(ime);
     
