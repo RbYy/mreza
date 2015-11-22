@@ -4,6 +4,16 @@ var x=parseInt($('#mre').val().split('x')[0]);
 var y=parseInt($('#mre').val().split('x')[1]);
 var ime_mreze=$('#ime_mreze').val();
 var aktivna=pk_default;
+var barve = {
+    "1":"green",
+    "2":"red",
+    "3":"blue",
+    "4":"brown",
+    "5":"yellow",
+    "6":"orange",
+    "7":"salmon",
+    "8":"dimgray"
+};
 
 function ustvariMrezo(x,y,ime_mreze){    
     /*ne izrisuje mreze; ustvari novo v bazi in doda na seznam*/
@@ -18,10 +28,10 @@ function ustvariMrezo(x,y,ime_mreze){
                                     aktivna = pk;
                                     $('.seznam_mrez').append('<li class="mreza_v_seznamu"><a id="mreza_'+ pk +'">'+ ime_mreze +'</a></li>');
                                     $('caption').text(ime_mreze+'  '+x+'x'+y);
-                                })
+                                });
         }
     else{
-        console.log('nepepolni vnosi')
+        console.log('nepepolni vnosi');
     }
 }
 
@@ -48,13 +58,13 @@ function shraniNoveDimenzijeMreze(x,y){
 
 
 function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
-     var batiment_id=data;
-     sirina=parseInt(sirina);
-     visina=parseInt(visina);
-     barva="orange";
-     $('table').append('<div class=" lik ' + vrsta + '" id="lik'+ batiment_id + '"><p class="zapri" name="'+ batiment_id +'" id ="zapri">X</p><p id="naslov_'+ batiment_id +'" class="naslov"></p></div>');
-         $( ".lik" ).draggable({
-                     stop: function( event, ui ) {
+    barva=barve[vrsta];
+    var batiment_id=data;
+    sirina=parseInt(sirina);
+    visina=parseInt(visina);
+    $('table').append('<div class=" lik ' + vrsta + '" id="lik'+ batiment_id + '"><p class="zapri" name="'+ batiment_id +'" id ="zapri">X</p><p id="naslov_'+ batiment_id +'" class="naslov"></p></div>');
+        $( ".lik" ).draggable({
+                    stop: function( event, ui ) {
                          tx= $('#mreza');
                          tx=tx.offset();
                          offx=ui.offset['left'];
@@ -106,7 +116,6 @@ function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
        
 function izrisiZacetnoStanje(){                         
     $.getJSON('/poslji_komplet/', {}, function(data){
-        barva="orange";
         izrisiMrezo(data[0].fields.sirina, data[0].fields.visina, data[0].fields.ime);
         jQuery.each(data.slice(2), function(i, val) {
             args=val.fields;
@@ -117,7 +126,7 @@ function izrisiZacetnoStanje(){
                             args.pozy, 
                             args.ime, 
                             args.vrsta, 
-                            barva);         
+                            args.vrsta);         
         }); 
     });
 }    
@@ -145,12 +154,12 @@ $('.seznam_mrez').on('click','.mreza_v_seznamu', function(event){
     /* preklapljanje med shranjenimi mrezammi */
     $('.lik').remove();
     pk=event.target.id.split('_')[1];
-    barva="orange";
     aktivna=pk
     $.getJSON('/aktiviraj_drugo_mrezo/', {'pk':pk}, function(data){
         izrisiMrezo(data[0].fields.sirina, data[0].fields.visina, data[0].fields.ime);
         jQuery.each(data.slice(2), function(i, val) {
             args=val['fields'];
+            console.log(args.vrsta);
             izrisi_batiment(val['pk'], 
                             args.sirina_bat, 
                             args.visina_bat, 
@@ -158,15 +167,16 @@ $('.seznam_mrez').on('click','.mreza_v_seznamu', function(event){
                             args.pozy, 
                             args.ime, 
                             args.vrsta, 
-                            barva);         
+                            args.vrsta);         
         }); 
     });
 });
                          
 $('#desno').on('click', '#novbat',function(){
-    var barva=$(".btn-colorselector").css("background-color");
-    var vrsta = 'vrsta'; /*to je za popravit -- drfault vrednost*/
-    
+    //var barva=$(".btn-colorselector").css("background-color");
+    barva=$("#vrsta").val();
+    console.log("barva: "+barva);
+    vrsta = $("#vrsta").val();
     var xx=parseInt($('#velikost').val().split('x')[0]);
     var yy=parseInt($('#velikost').val().split('x')[1]);
     var ime=$('#ime').val();
@@ -174,7 +184,7 @@ $('#desno').on('click', '#novbat',function(){
     var zacetni_offset_y = 400;
     $.get('/ustvari_batiment/',{
                     'ime': ime,
-                    'vrsta': vrsta,
+                    'vrsta': $("#vrsta").val(),
                     'sirina': xx,
                     'visina': yy,
                     'offx': zacetni_offset_x,
