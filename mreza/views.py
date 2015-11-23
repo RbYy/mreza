@@ -16,32 +16,49 @@ from django.utils import timezone
 
 @login_required
 def ustvari_mrezo(request):
-    try:
-        print(request.user, request.GET['ime_mreze'],timezone.now(),int(request.GET['sirina']),
-                             int(request.GET['visina']),
-                             request.user)
-        try:
-            aktivna_mreza=Mreza.objects.get(uporabnik=request.user, aktivna=True)
-            print('najdena!!!!')
-            aktivna_mreza.aktivna=False
-            aktivna_mreza.save()
-            print('do to je uredi')
-            ustvarjena_mreza = Mreza.objects.create(
-                             ime=request.GET['ime_mreze'],
-                             datum=timezone.now(),
-                             sirina=int(request.GET['sirina']),
-                             visina=int(request.GET['visina']),
-                             aktivna=True,
-                             uporabnik=request.user,
-                             )
-            
-        except:
-            print('kje je ')
+
+    aktivna_mreza=Mreza.objects.get(uporabnik=request.user, aktivna=True)
+    print('111')
+    batimenti_na_aktivni_mrezi = Batiment.objects.filter(mreza=aktivna_mreza)
+    
+    
+    nova_mreza=aktivna_mreza
+    nova_mreza.pk=None
+    nova_mreza.save()   
+    nova_mreza.ime=request.GET['ime_mreze']
+    nova_mreza.datum=timezone.now()
+    nova_mreza.save()
+
+    print('nova mreza: ', nova_mreza.pk, nova_mreza.aktivna)
+    for batiment in batimenti_na_aktivni_mrezi:
+        print('kopiraj batimente')
+        koordinate_za_kopirat=batiment.koordinate_set.all().order_by('pk')
+        batiment.pk=None 
+        batiment.save()
+        batiment.mreza=nova_mreza
+        batiment.save()
+        for koordinata in koordinate_za_kopirat:
+            koordinata.pk=None
+            koordinata.save()
+            print('kopiraj koord: ', koordinata.pk)
+            koordinata.batiment=batiment
+            koordinata.save()
+       
         
-    except:
-        print('napaka')
-    print("pkpkpk", ustvarjena_mreza.pk)
-    return HttpResponse(ustvarjena_mreza.pk)
+    #nova_mreza.aktivna=True
+    
+    
+    print('najdena!!!!')
+    aktivna_mreza.aktivna=False
+    print("116")
+    aktivna_mreza.save()
+    
+    print('do to je uredi')
+
+
+    print("stara:", aktivna_mreza.pk, aktivna_mreza.aktivna, '   nova: ',nova_mreza.pk, nova_mreza.aktivna)
+    print("stara:", aktivna_mreza.id, '   nova: ',nova_mreza.id)
+    return HttpResponse(nova_mreza.pk)
 
 @login_required
 def povleci_mreze(request):
@@ -95,23 +112,30 @@ def aktiviraj_drugo_mrezo(request):
     return poslji_komplet(request)
     
 def poslji_komplet(request): #poslje mrezo izpolnjeno z batimenti
-    print('ssss')
+    for mreza in Mreza.objects.all():
+        print(mreza.aktivna)
     aktivna_mreza=Mreza.objects.get(uporabnik=request.user, aktivna=True)
+    #print(aktivna_mreza.aktivna)
     batimenti_na_mrezi = Batiment.objects.filter(mreza=aktivna_mreza)
     batimenti_json=serializers.serialize('json', batimenti_na_mrezi)
     mreza_json=serializers.serialize('json', [aktivna_mreza,])
     batimenti_json_odkodirano=json.loads(batimenti_json)
     mreza_json_odkodirano=json.loads(mreza_json)
-    print('wertzui')
     i=0
     for bat in batimenti_na_mrezi:
-        pozx=Koordinate.objects.filter(batiment=bat).order_by('-id')[0].x
-        pozy=Koordinate.objects.filter(batiment=bat).order_by('-id')[0].y 
+        print(bat.ime)
+        print(bat.koordinate_set.all())
+        print(Koordinate.objects.filter(batiment=bat))
+        pozx=Koordinate.objects.filter(batiment=bat).order_by('-pk')[0].x
+        print('to iscemo ',pozx)
+        pozy=Koordinate.objects.filter(batiment=bat).order_by('-pk')[0].y
+        print('in to ',pozx,pozy) 
         batimenti_json_odkodirano[i]['fields']['pozx']=pozx
         batimenti_json_odkodirano[i]['fields']['pozy']=pozy
         i+=1
-   
+    print('fff')
     mreza_z_batimenti=mreza_json_odkodirano+batimenti_json_odkodirano
+    print('ggg')
 
     mreza_z_batimenti_json=json.dumps(mreza_z_batimenti, cls=DjangoJSONEncoder)
     print(mreza_z_batimenti_json)
@@ -141,8 +165,8 @@ def ustvari_batiment(request):
 @login_required
 def zbrisi_batiment(request):
     print('vsaj pride notr')
-    batiment_za_zbrisat = Batiment.objects.get(id=int(request.GET['id']))
-    print("nrdi še enu vrsticu")
+    batiment_za_zbrisat = Batiment.objects.get(pk=int(request.GET['id']))
+    print("nrdi e enu vrsticu")
     #print(batiment_za_zbrisat.ime)
     batiment_za_zbrisat.delete()
     print(Batiment.objects.all().count())
@@ -150,7 +174,7 @@ def zbrisi_batiment(request):
 
 def shrani_nove_koordinate_batimenta(request):
     print("tudi to so težave")
-    tbatiment=Batiment.objects.get(id=request.GET['id'])
+    tbatiment=Batiment.objects.get(pk=request.GET['id'])
     print('kooor')
     kor=Koordinate.objects.create(x=int(request.GET['offx']), y=int(request.GET['offy']), batiment=tbatiment)
     return HttpResponse(kor.x)
