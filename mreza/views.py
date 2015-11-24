@@ -123,19 +123,13 @@ def poslji_komplet(request): #poslje mrezo izpolnjeno z batimenti
     mreza_json_odkodirano=json.loads(mreza_json)
     i=0
     for bat in batimenti_na_mrezi:
-        print(bat.ime)
-        print(bat.koordinate_set.all())
-        print(Koordinate.objects.filter(batiment=bat))
         pozx=Koordinate.objects.filter(batiment=bat).order_by('-pk')[0].x
-        print('to iscemo ',pozx)
         pozy=Koordinate.objects.filter(batiment=bat).order_by('-pk')[0].y
         print('in to ',pozx,pozy) 
         batimenti_json_odkodirano[i]['fields']['pozx']=pozx
         batimenti_json_odkodirano[i]['fields']['pozy']=pozy
         i+=1
-    print('fff')
     mreza_z_batimenti=mreza_json_odkodirano+batimenti_json_odkodirano
-    print('ggg')
 
     mreza_z_batimenti_json=json.dumps(mreza_z_batimenti, cls=DjangoJSONEncoder)
     print(mreza_z_batimenti_json)
@@ -143,39 +137,25 @@ def poslji_komplet(request): #poslje mrezo izpolnjeno z batimenti
     
 @login_required
 def ustvari_batiment(request):
-    print('je prslo notr')
     novi_batiment=Batiment.objects.create(visina_bat=int(request.GET['visina']),
                             sirina_bat=int(request.GET['sirina']),
                             vrsta=request.GET['vrsta'],
                             ime=request.GET['ime'],
                             mreza=Mreza.objects.get(uporabnik=request.user, aktivna=True))
-    print('do to')
     Koordinate.objects.create(
                               x=int(request.GET['offx']),
                               y=int(request.GET['offy']),
                               batiment=novi_batiment)
-    print(Batiment.objects.all())
-    
-    
-    print('----------------')
-    print(Koordinate.objects.all())
-    print(novi_batiment.id)
     return HttpResponse(str(novi_batiment.pk))
 
 @login_required
 def zbrisi_batiment(request):
-    print('vsaj pride notr')
     batiment_za_zbrisat = Batiment.objects.get(pk=int(request.GET['id']))
-    print("nrdi e enu vrsticu")
-    #print(batiment_za_zbrisat.ime)
     batiment_za_zbrisat.delete()
-    print(Batiment.objects.all().count())
     return HttpResponse('batiment zbrisan')
 
 def shrani_nove_koordinate_batimenta(request):
-    print("tudi to so težave")
     tbatiment=Batiment.objects.get(pk=request.GET['id'])
-    print('kooor')
     kor=Koordinate.objects.create(x=int(request.GET['offx']), y=int(request.GET['offy']), batiment=tbatiment)
     return HttpResponse(kor.x)
     

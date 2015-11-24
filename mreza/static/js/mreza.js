@@ -81,6 +81,7 @@ function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
         $( ".lik" ).draggable({
                     stop: function( event, ui ) {
                          tx= $('#mreza');
+                         console.log('pk od batimenta: '+ $(this).attr('id').slice(3));
                          tx=tx.offset();
                          offx=ui.offset['left'];
                          offy=ui.offset['top'],
@@ -90,7 +91,7 @@ function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
                          $.get('/shrani_nove_koordinate_batimenta/', 
                                              {'offx': ox,
                                              'offy': oy,
-                                             'id': batiment_id}, 
+                                             'id': $(this).attr('id').slice(3)}, 
                                              function(data){
                                              });
                                              }
