@@ -18,7 +18,6 @@ function aktivirajDrugoMrezo(pk){
         izrisiMrezo(data[0].fields.sirina, data[0].fields.visina, data[0].fields.ime);
         jQuery.each(data.slice(2), function(i, val) {
             args=val['fields'];
-            console.log(args.vrsta);
             izrisi_batiment(val['pk'], 
                             args.sirina_bat, 
                             args.visina_bat, 
@@ -113,7 +112,6 @@ function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
               $("#lik"+id).remove();
               $.get('/zbrisi_batiment/', {'id': id},
                                      function(data){
-                                        console.log(data);
                                  });
       });
 }                         
