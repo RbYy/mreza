@@ -87,10 +87,18 @@ def poslji_komplet(request): #poslje mrezo izpolnjeno z batimenti
     batimenti_json_odkodirano=json.loads(batimenti_json)
     mreza_json_odkodirano=json.loads(mreza_json)
     i=0
+    print('aaaa')
     for bat in batimenti_na_mrezi:
-        pozx=Koordinate.objects.filter(batiment=bat).order_by('-pk')[0].x
-        pozy=Koordinate.objects.filter(batiment=bat).order_by('-pk')[0].y
+        print('poli')
+        try:
+            akt=Koordinate.objects.get(batiment__mreza=aktivna_mreza, aktivna=True)
+            pozx=Koordinate.objects.filter(batiment=bat, pk__lte=akt.pk).order_by('-pk')[0].x
+            pozy=Koordinate.objects.filter(batiment=bat, pk__lte=akt.pk).order_by('-pk')[0].y
+            print('ddddddd')
+        except:
+            print('ss')    
         batimenti_json_odkodirano[i]['fields']['pozx']=pozx
+        print('fffffffffff')
         batimenti_json_odkodirano[i]['fields']['pozy']=pozy
         i+=1
     mreza_z_batimenti=mreza_json_odkodirano+batimenti_json_odkodirano
@@ -99,15 +107,31 @@ def poslji_komplet(request): #poslje mrezo izpolnjeno z batimenti
     
 @login_required
 def ustvari_batiment(request):
-    novi_batiment=Batiment.objects.create(visina_bat=int(request.GET['visina']),
-                            sirina_bat=int(request.GET['sirina']),
-                            vrsta=request.GET['vrsta'],
-                            ime=request.GET['ime'],
-                            mreza=Mreza.objects.get(uporabnik=request.user, aktivna=True))
+    aktivna_mreza=Mreza.objects.get(
+                              uporabnik=request.user, 
+                              aktivna=True)
+    print('qqq')
+    novi_batiment=Batiment.objects.create(
+                              visina_bat=int(request.GET['visina']),
+                              sirina_bat=int(request.GET['sirina']),
+                              vrsta=request.GET['vrsta'],
+                              ime=request.GET['ime'],
+                              mreza=aktivna_mreza)
+    print('www')
+    try: #če je sploh že kakšen batiment na mreži
+        zadnje_koordinate=Koordinate.objects.get(batiment__mreza=aktivna_mreza, aktivna=True)
+        zadnje_koordinate.aktivna=False
+        zadnje_koordinate.save()
+        print('no exception')
+    except:
+        print('ni nobenega batimenta, da bi mu dal koordinate na False')
+    print('eee')
     Koordinate.objects.create(
                               x=int(request.GET['offx']),
                               y=int(request.GET['offy']),
+                              aktivna=True,
                               batiment=novi_batiment)
+    print('rrr')
     return HttpResponse(str(novi_batiment.pk))
 
 @login_required
@@ -118,9 +142,52 @@ def zbrisi_batiment(request):
 
 def shrani_nove_koordinate_batimenta(request):
     tbatiment=Batiment.objects.get(pk=request.GET['id'])
-    kor=Koordinate.objects.create(x=int(request.GET['offx']), y=int(request.GET['offy']), batiment=tbatiment)
-    return HttpResponse(kor.x)
-    
+    stare_koordinate = Koordinate.objects.get(aktivna=True, batiment__mreza__aktivna=True)
+    print(stare_koordinate.aktivna)
+    stare_koordinate.aktivna = False
+    stare_koordinate.save()
+    nove_koordinate=Koordinate.objects.create(
+                                              x=int(request.GET['offx']), 
+                                              y=int(request.GET['offy']),
+                                              aktivna=True, 
+                                              batiment=tbatiment)
+    return HttpResponse(nove_koordinate.x)
+
+@login_required
+def nazaj(request):
+    aktivna_mreza=Mreza.objects.get(uporabnik=request.user, aktivna=True)
+    zgodovina_mreze=Koordinate.objects.filter(batiment__mreza = aktivna_mreza)
+    print('ddddeee')
+    trenutna_poteza = zgodovina_mreze.get(aktivna=True)
+    print('dedede')
+    poteza_nazaj=zgodovina_mreze.filter(
+                                        pk__lt=trenutna_poteza.pk
+                                        ).order_by('-pk')[0]
+    print('eee')
+    trenutna_poteza.aktivna=False
+    poteza_nazaj.aktivna=True
+    trenutna_poteza.save()
+    poteza_nazaj.save()
+    response=serializers.serialize('json', [poteza_nazaj,])
+    print(response)
+    return HttpResponse(response)
+
+@login_required
+def naprej(request):
+    aktivna_mreza=Mreza.objects.get(uporabnik=request.user, aktivna=True)
+    zgodovina_mreze=Koordinate.objects.filter(batiment__mreza = aktivna_mreza)
+    trenutna_poteza = zgodovina_mreze.get(aktivna=True)
+    poteza_naprej=zgodovina_mreze.filter(
+                                        pk__gt=trenutna_poteza.pk
+                                        ).order_by('pk')[0]
+    trenutna_poteza.aktivna=False
+    poteza_naprej.aktivna=True
+    trenutna_poteza.save()
+    poteza_naprej.save()
+    response=serializers.serialize('json', [poteza_naprej,])
+    print(response)
+    return HttpResponse(response)    
+
 @login_required
 def odjava(*args, **kwargs):
     logout(args[0])

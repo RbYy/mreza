@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-# Create your models here.
 
 class Mreza(models.Model):
     ime = models.CharField(max_length=30)
@@ -20,5 +19,8 @@ class Batiment(models.Model):
 class Koordinate(models.Model):
     x = models.IntegerField()
     y = models.IntegerField()
+    aktivna = models.BooleanField()
     batiment = models.ForeignKey(Batiment)
-    
+
+#class Zgodovina(models.Model):
+#    premik = models.ForeignKey    

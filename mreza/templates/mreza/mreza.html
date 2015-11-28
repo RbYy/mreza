@@ -39,6 +39,9 @@ body {
 label {
     text-align: right;
     }
+.glyphicon {
+    padding: 10px;
+}
 
 </style>
 </head>
@@ -62,7 +65,11 @@ label {
             </li>
             <li><a href="{% url 'mreza' %}">nastavitve</a></li>
             <li><a href="{% url 'mreza' %}">statistika</a></li>
-                
+            <li style="width:100px"></li>
+
+            <li class="">
+
+            </li>
         </ul>
                 
         <ul class="nav navbar-nav navbar-right" style="padding-right:6em">
@@ -83,8 +90,13 @@ label {
 <div class="row">
     <div class="tabela col-xs-8" id="mreza">
         <table class="table-bordered">
-        <caption> mreža: {{ default_mreza.ime }}</caption>
-
+        <caption> <span id="cap-ime">mreža: {{ default_mreza.ime }}</span>
+    
+        </caption>
+                <div class="naprej-nazaj btn-group" role="group" aria-label="...">
+                  <button type="button" class="nazaj btn btn-default">nazaj<span class="glyphicon glyphicon-backward"></span></button>
+                  <button type="button" class=" naprej btn btn-default"><span class="glyphicon glyphicon-forward">naprej</span></button>
+                </div>        
             <tbody class='t'></tbody>
             
         </table>
