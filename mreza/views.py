@@ -8,7 +8,6 @@ import json
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
-from lib2to3.pgen2.token import STAREQUAL
 
 
 @login_required
@@ -91,9 +90,7 @@ def poslji_komplet(request): #poslje mrezo izpolnjeno z batimenti
     batimenti_json_odkodirano=json.loads(batimenti_json)
     mreza_json_odkodirano=json.loads(mreza_json)
     i=0
-    print('aaaa')
     for bat in batimenti_na_mrezi:
-        print('poli')
         try:
             akt=Koordinate.objects.get(
                             batiment__mreza=aktivna_mreza,
@@ -108,8 +105,7 @@ def poslji_komplet(request): #poslje mrezo izpolnjeno z batimenti
                             batiment=bat,
                             pk__lte=akt.pk
                             ).order_by('-pk')[0].y
-                            
-            print('ddddddd')
+
         except:
             print('ss')    
         batimenti_json_odkodirano[i]['fields']['pozx']=pozx
