@@ -78,6 +78,7 @@ function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
                          offy=ui.offset['top'],
                          ox=offx-tx.left;
                          oy=offy-tx.top;
+                         console.log('x: '+ox+'  y: '+oy)
                          $.get('/shrani_nove_koordinate_batimenta/', 
                                              {'offx': ox,
                                              'offy': oy,
@@ -135,21 +136,33 @@ function izrisiZacetnoStanje(){
 
 function nazaj(){
     $.getJSON('/nazaj/', {}, function(data){
-        console.log(data[0].fields.batiment);
-        $('#lik'+data[0].fields.batiment).css({
-                 "left": data[0].fields.x,
-                 "top": data[0].fields.y,
-                }
-        );       
+        a=data[0].fields;
+        console.log(data.length)
+        if (data.length == 1){
+            console.log(a.batiment+'::'+a.x+'::'+a.y);
+            $('#lik'+data[0].fields.batiment).css({
+                     "left": a.x,
+                     "top": a.y,
+                    }
+            );       
+        }else if(data.length ==2){
+        
+            $('#lik'+data[0].fields.batiment).hide();
+            console.log('skrij batiment');
+        }else{
+            console.log('na koncu')
+            $('.lik').hide();
+        }    
     }); 
 }
 
 function naprej(){
     $.getJSON('/naprej/', {}, function(data){
-        console.log(data[0].fields.batiment);
+        a=data[0].fields
+        console.log(a.batiment+'::'+a.x+'::'+a.y);
         $('#lik'+data[0].fields.batiment).css({
-                 "left": data[0].fields.x,
-                 "top": data[0].fields.y,
+                 "left": a.x,
+                 "top": a.y,
                 }
         );       
     });     

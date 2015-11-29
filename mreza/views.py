@@ -8,6 +8,7 @@ import json
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
+from lib2to3.pgen2.token import STAREQUAL
 
 
 @login_required
@@ -57,14 +58,17 @@ def shrani_nove_dimenzije_mreze(request):
 @login_required
 def mreza(request):
     try:
-        grid = Mreza.objects.get(uporabnik=request.user, aktivna=True)
+        grid = Mreza.objects.get(
+                        uporabnik=request.user,
+                        aktivna=True)
     except:
-        grid=Mreza.objects.create(ime='prva mreza',
-                                  datum=timezone.now(),
-                                  sirina=25,
-                                  visina=25,
-                                  aktivna=True,
-                                  uporabnik=request.user)
+        grid=Mreza.objects.create(
+                        ime='prva mreza',
+                        datum=timezone.now(),
+                        sirina=25,
+                        visina=25,
+                        aktivna=True,
+                        uporabnik=request.user)
     vse_mreze=Mreza.objects.filter(uporabnik=request.user)    
     return render(request, 'mreza/mreza.html', {'default_mreza':grid,
                                                 'vse_mreze':vse_mreze})
@@ -91,14 +95,24 @@ def poslji_komplet(request): #poslje mrezo izpolnjeno z batimenti
     for bat in batimenti_na_mrezi:
         print('poli')
         try:
-            akt=Koordinate.objects.get(batiment__mreza=aktivna_mreza, aktivna=True)
-            pozx=Koordinate.objects.filter(batiment=bat, pk__lte=akt.pk).order_by('-pk')[0].x
-            pozy=Koordinate.objects.filter(batiment=bat, pk__lte=akt.pk).order_by('-pk')[0].y
+            akt=Koordinate.objects.get(
+                            batiment__mreza=aktivna_mreza,
+                            aktivna=True)
+            
+            pozx=Koordinate.objects.filter(
+                            batiment=bat,
+                            pk__lte=akt.pk
+                            ).order_by('-pk')[0].x
+                            
+            pozy=Koordinate.objects.filter(
+                            batiment=bat,
+                            pk__lte=akt.pk
+                            ).order_by('-pk')[0].y
+                            
             print('ddddddd')
         except:
             print('ss')    
         batimenti_json_odkodirano[i]['fields']['pozx']=pozx
-        print('fffffffffff')
         batimenti_json_odkodirano[i]['fields']['pozy']=pozy
         i+=1
     mreza_z_batimenti=mreza_json_odkodirano+batimenti_json_odkodirano
@@ -108,29 +122,39 @@ def poslji_komplet(request): #poslje mrezo izpolnjeno z batimenti
 @login_required
 def ustvari_batiment(request):
     aktivna_mreza=Mreza.objects.get(
-                              uporabnik=request.user, 
-                              aktivna=True)
+                            uporabnik=request.user, 
+                            aktivna=True)
     print('qqq')
+    
     novi_batiment=Batiment.objects.create(
-                              visina_bat=int(request.GET['visina']),
-                              sirina_bat=int(request.GET['sirina']),
-                              vrsta=request.GET['vrsta'],
-                              ime=request.GET['ime'],
-                              mreza=aktivna_mreza)
+                            visina_bat=int(request.GET['visina']),
+                            sirina_bat=int(request.GET['sirina']),
+                            vrsta=request.GET['vrsta'],
+                            ime=request.GET['ime'],
+                            mreza=aktivna_mreza)
     print('www')
     try: #če je sploh že kakšen batiment na mreži
-        zadnje_koordinate=Koordinate.objects.get(batiment__mreza=aktivna_mreza, aktivna=True)
-        zadnje_koordinate.aktivna=False
-        zadnje_koordinate.save()
+        #poisci kje je kazalec
+        stare_koordinate=Koordinate.objects.get(
+                            batiment__mreza=aktivna_mreza,
+                            aktivna=True)
+        
+        #zbrisi vse poteze od kazalca naprej (onemogoci "redo")
+        poteze_za_zbrisat = Koordinate.objects.filter(
+                            batiment__mreza=aktivna_mreza,
+                            pk__gt=stare_koordinate.pk)
+        poteze_za_zbrisat.delete()        
+        stare_koordinate.aktivna=False
+        stare_koordinate.save()
         print('no exception')
     except:
         print('ni nobenega batimenta, da bi mu dal koordinate na False')
     print('eee')
     Koordinate.objects.create(
-                              x=int(request.GET['offx']),
-                              y=int(request.GET['offy']),
-                              aktivna=True,
-                              batiment=novi_batiment)
+                            x=int(request.GET['offx']),
+                            y=int(request.GET['offy']),
+                            aktivna=True,
+                            batiment=novi_batiment)
     print('rrr')
     return HttpResponse(str(novi_batiment.pk))
 
@@ -142,33 +166,73 @@ def zbrisi_batiment(request):
 
 def shrani_nove_koordinate_batimenta(request):
     tbatiment=Batiment.objects.get(pk=request.GET['id'])
+    
+    #poisci kje je kazalec
     stare_koordinate = Koordinate.objects.get(aktivna=True, batiment__mreza__aktivna=True)
     print(stare_koordinate.aktivna)
+    
+    #zbrisi vse poteze od kazalca naprej (onemogoci "redo")
+    poteze_za_zbrisat = Koordinate.objects.filter(
+                                            batiment__mreza__aktivna=True,
+                                            pk__gt=stare_koordinate.pk)
+    poteze_za_zbrisat.delete()
     stare_koordinate.aktivna = False
     stare_koordinate.save()
     nove_koordinate=Koordinate.objects.create(
-                                              x=int(request.GET['offx']), 
-                                              y=int(request.GET['offy']),
-                                              aktivna=True, 
-                                              batiment=tbatiment)
+                                            x=int(request.GET['offx']), 
+                                            y=int(request.GET['offy']),
+                                            aktivna=True, 
+                                            batiment=tbatiment)
     return HttpResponse(nove_koordinate.x)
 
 @login_required
 def nazaj(request):
     aktivna_mreza=Mreza.objects.get(uporabnik=request.user, aktivna=True)
+    
+    #vse koordinate na tej mrezi
     zgodovina_mreze=Koordinate.objects.filter(batiment__mreza = aktivna_mreza)
-    print('ddddeee')
+    
+    #kazalec - aktualne koordinate
     trenutna_poteza = zgodovina_mreze.get(aktivna=True)
-    print('dedede')
-    poteza_nazaj=zgodovina_mreze.filter(
-                                        pk__lt=trenutna_poteza.pk
-                                        ).order_by('-pk')[0]
-    print('eee')
+    print('eeeeeee')
+    #batiment na potezi kjer je kazalec
+    bat=trenutna_poteza.batiment
+    
+    try:
+        #najdi predhodne koordinate tega batimenta
+        #na [0] so trenutne koordinate batimenta, na [1] so koordinate ene poteze prej
+        povrni=zgodovina_mreze.filter(
+                                pk__lte=trenutna_poteza.pk,
+                                batiment=bat
+                                ).order_by('-pk')[1]         
+        
+
+        print('eee')
+
+        response=serializers.serialize('json', [povrni,])
+    except:
+        print('exception')
+        response=serializers.serialize('json', [trenutna_poteza,])
+        print(response)
+        response=json.loads(response)
+        print('111')
+        response.append('x')
+        print('222')
+        response=json.dumps(response, cls=DjangoJSONEncoder)
+        print(response)
+        
+    try:    
+        #najdi koordinate ene poteze nazaj absolutna, kamor naj se premakne kazalec
+        poteza_nazaj=zgodovina_mreze.filter(
+                            pk__lt=trenutna_poteza.pk
+                            ).order_by('-pk')[0]
+    except:
+        return HttpResponse('["x", "y", "z"]')                               
+    #premakni kazalec eno potezo nazaj
     trenutna_poteza.aktivna=False
     poteza_nazaj.aktivna=True
     trenutna_poteza.save()
-    poteza_nazaj.save()
-    response=serializers.serialize('json', [poteza_nazaj,])
+    poteza_nazaj.save()    
     print(response)
     return HttpResponse(response)
 
