@@ -15,12 +15,16 @@ class Batiment(models.Model):
     vrsta = models.CharField(max_length=30)
     ime = models.CharField(max_length=20)
     mreza = models.ForeignKey(Mreza)
+    viden = models.BooleanField()
+    def __str__(self):
+        return 'pk: '+str(self.pk)+'  ::  '+self.ime+' ::  viden: '+str(self.viden)
     
 class Koordinate(models.Model):
     x = models.IntegerField()
     y = models.IntegerField()
     aktivna = models.BooleanField()
     batiment = models.ForeignKey(Batiment)
+    brisanje = models.BooleanField(default=False)
 
 #class Zgodovina(models.Model):
 #    premik = models.ForeignKey    

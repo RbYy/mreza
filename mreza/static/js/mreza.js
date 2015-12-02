@@ -79,11 +79,14 @@ function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
                          ox=offx-tx.left;
                          oy=offy-tx.top;
                          console.log('x: '+ox+'  y: '+oy)
-                         $.get('/shrani_nove_koordinate_batimenta/', 
+                         $.getJSON('/shrani_nove_koordinate_batimenta/', 
                                              {'offx': ox,
                                              'offy': oy,
                                              'id': $(this).attr('id').slice(3)}, 
                                              function(data){
+                                                for (var pk in data){
+                                                    $('#lik'+pk).remove();
+                                                } 
                                              });
                                              }
          });
@@ -110,10 +113,10 @@ function izrisi_batiment(data, sirina, visina, x, y, ime, vrsta,barva){
            
      $('.lik').on('click', '.zapri', function(event){
               id=$(this).attr("name");
-              $("#lik"+id).remove();
               $.get('/zbrisi_batiment/', {'id': id},
-                                     function(data){
-                                 });
+                    function(data){
+                        $("#lik"+id).hide();                      
+                     });
       });
 }                         
        
@@ -135,23 +138,27 @@ function izrisiZacetnoStanje(){
 }    
 
 function nazaj(){
+    
     $.getJSON('/nazaj/', {}, function(data){
-        a=data[0].fields;
+        a=data[0];
         console.log(data.length)
         if (data.length == 1){
-            console.log(a.batiment+'::'+a.x+'::'+a.y);
-            $('#lik'+data[0].fields.batiment).css({
-                     "left": a.x,
-                     "top": a.y,
+            console.log(a.fields.batiment+'::'+a.fields.x+'::'+a.fields.y);
+            $('#lik'+a.fields.batiment).css({
+                     "left": a.fields.x,
+                     "top": a.fields.y,
                     }
             );       
-        }else if(data.length ==2){
+        }else if(data.length == 2){
         
-            $('#lik'+data[0].fields.batiment).hide();
+            $('#lik'+data[0].pk).hide();
             console.log('skrij batiment');
+        }else if(data.length ==3){
+            console.log('undo brisanje'+a.fields.batiment)
+            $('#lik'+a.fields.batiment).show();
         }else{
-            console.log('na koncu')
-            $('.lik').hide();
+            console.log('na koncu '+a)
+            $('#lik'+a).hide();
         }    
     }); 
 }
@@ -159,12 +166,22 @@ function nazaj(){
 function naprej(){
     $.getJSON('/naprej/', {}, function(data){
         a=data[0].fields
-        console.log(a.batiment+'::'+a.x+'::'+a.y);
-        $('#lik'+data[0].fields.batiment).css({
-                 "left": a.x,
-                 "top": a.y,
-                }
-        );       
+        console.log(data)
+        if (data[1] == 'true'){
+            console.log('viden = true');
+            $('#lik'+a.batiment).show();
+            console.log(a.batiment+'::'+a.x+'::'+a.y);
+            $('#lik'+a.batiment).css({
+                "left": a.x,
+                "top": a.y,
+            });
+            if (a.brisanje == true){
+                console.log('redo brisanje')
+                $('#lik'+a.batiment).hide()
+            }
+        }else{
+            $('#lik'+a.batiment).hide();
+        }      
     });     
 }
 izrisiZacetnoStanje();
@@ -213,7 +230,7 @@ $('#desno').on('click', '#novbat',function(){
     var ime=$('#ime').val();
     var zacetni_offset_x = 500;
     var zacetni_offset_y = 400;
-    $.get('/ustvari_batiment/',{
+    $.getJSON('/ustvari_batiment/',{
                     'ime': ime,
                     'vrsta': $("#vrsta").val(),
                     'sirina': xx,
@@ -222,7 +239,7 @@ $('#desno').on('click', '#novbat',function(){
                     'offy': zacetni_offset_y,
                     'aktivna': aktivna},
                     function(data){
-                        izrisi_batiment(data, 
+                        izrisi_batiment(data[1], 
                                         xx, 
                                         yy, 
                                         zacetni_offset_x, 
@@ -230,6 +247,10 @@ $('#desno').on('click', '#novbat',function(){
                                         ime, 
                                         vrsta, 
                                         barva);
+                        for (var pk in data[0].brisi){
+                            $('#lik'+pk).remove();  
+                        }
+                        
                     });
 });
 
