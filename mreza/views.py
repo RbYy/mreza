@@ -96,26 +96,26 @@ def poslji_komplet(request): #poslje mrezo izpolnjeno z batimenti
     for bat in vidni_batimenti_na_mrezi:
         try:
             if Koordinate.objects.filter(batiment__mreza=aktivna_mreza, aktivna=True).count() == 0:
-                print('pogoj'+str(Koordinate.objects.filter(batiment__mreza=aktivna_mreza, aktivna=True).count()))
+                #print('pogoj'+str(Koordinate.objects.filter(batiment__mreza=aktivna_mreza, aktivna=True).count()))
                 a=Koordinate.objects.filter(
                            batiment__mreza=aktivna_mreza
                            ).order_by('-pk')[0]
                 a.aktivna=True
                 a.save()
             if Koordinate.objects.filter(batiment__mreza=aktivna_mreza, aktivna=True).count() > 1:
-                print('pogoj'+str(Koordinate.objects.filter(batiment__mreza=aktivna_mreza, aktivna=True).count()))
+                #print('pogoj'+str(Koordinate.objects.filter(batiment__mreza=aktivna_mreza, aktivna=True).count()))
                 a=Koordinate.objects.filter(
                            batiment__mreza=aktivna_mreza,
                            aktivna=True
                            ).order_by('pk')[0]
                 a.aktivna=False
                 a.save()            
-            print('pogoj'+str(Koordinate.objects.filter(batiment__mreza=aktivna_mreza, aktivna=True).count()))
-            print('ttt')
+            #print('pogoj'+str(Koordinate.objects.filter(batiment__mreza=aktivna_mreza, aktivna=True).count()))
+            
             akt=Koordinate.objects.get(
                             batiment__mreza=aktivna_mreza,
                             aktivna=True)
-            print(akt)
+            #print(akt)
             print('rrr')
             pozx=Koordinate.objects.filter(
                             batiment=bat,
@@ -179,7 +179,7 @@ def ustvari_batiment(request):
     nevidni_batimenti=Batiment.objects.filter(viden=False, mreza__aktivna=True)
     for bat in nevidni_batimenti:
         prve_koordinate=bat.koordinate_set.all().order_by('pk')[0]
-        print(stare_koordinate.pk, prve_koordinate.pk)
+        #print(stare_koordinate.pk, prve_koordinate.pk)
         
         if stare_koordinate.pk < prve_koordinate.pk:
             print('0000')
@@ -191,7 +191,7 @@ def ustvari_batiment(request):
             koo_bri = bat.koordinate_set.filter(brisanje=True
                                                 ).order_by('-pk')[0]
             if stare_koordinate.pk < koo_bri.pk:
-                print('stare: ',stare_koordinate.pk, '   koordinate ob brisanju: ',koo_bri.pk,'  brisanjeeeeeeeeeee')
+                #print('stare: ',stare_koordinate.pk, '   koordinate ob brisanju: ',koo_bri.pk,'  brisanjeeeeeeeeeee')
                 bat_bri.append(bat.pk)
                 bat.delete() 
     print('ggg')    
@@ -220,35 +220,38 @@ def zbrisi_batiment(request):
     koordinate_batimenta_za_brisat.pk=None
     koordinate_batimenta_za_brisat.save()
     print('ddd',koordinate_batimenta_za_brisat.brisanje)
-    #koordinate_batimenta_za_brisat.aktivna=True
-    #koordinate_batimenta_za_brisat.brisanje=True
     koordinate_batimenta_za_brisat.save()
+    for x in Koordinate.objects.filter(batiment=batiment_za_zbrisat).order_by('pk'):
+        print('888')
+        x.brisanje=False
+        x.save()
+        print('koordinate batimenta: pk: ',x.pk, '  --  brisanje: ',x.brisanje)
     zadnje_koordinate_ob_brisanju = Koordinate.objects.filter(
                                 batiment=batiment_za_zbrisat
                                 ).order_by('-pk')[0]
     zadnje_koordinate_ob_brisanju.brisanje=True
     zadnje_koordinate_ob_brisanju.aktivna=True
     zadnje_koordinate_ob_brisanju.save()
-    print('koordinate ob brisanju: ',zadnje_koordinate_ob_brisanju.brisanje)
-    print('ddd',koordinate_batimenta_za_brisat.brisanje)
-    #batiment_za_zbrisat.delete()
+    #print('koordinate ob brisanju: ',zadnje_koordinate_ob_brisanju.brisanje)
+    #print('ddd',koordinate_batimenta_za_brisat.brisanje)
     print(batiment_za_zbrisat)
     return HttpResponse(batiment_za_zbrisat.pk)
 
 def shrani_nove_koordinate_batimenta(request):
-
+    aktivna_mreza=Mreza.objects.get(aktivna=True, uporabnik=request.user)
     print(request.GET)
-    for bat in Batiment.objects.filter(mreza__aktivna=True):
+    for bat in Batiment.objects.filter(mreza=aktivna_mreza):
         print(bat)
     tbatiment=Batiment.objects.get(pk=str(request.GET['id']))
-    print('premakni batiment  ',tbatiment.pk)
+    #print('premakni batiment  ',tbatiment.pk)
     #poisci kje je kazalec
     stare_koordinate = Koordinate.objects.get(aktivna=True, batiment__mreza__aktivna=True)
-    print(stare_koordinate)
+    #print(stare_koordinate)
     bat_bri =[]
     #iz baze odstrani batimente za brisat - onemogoči redo
     #briši tiste batimente, ki so bili ustvarjeni po trenutku na katerega kaze kazalec
     nevidni_batimenti=Batiment.objects.filter(viden=False, mreza__aktivna=True)
+    print(nevidni_batimenti)
     for bat in nevidni_batimenti:
         prve_koordinate=bat.koordinate_set.all().order_by('pk')[0]
         print(stare_koordinate.pk, prve_koordinate.pk)
@@ -258,12 +261,14 @@ def shrani_nove_koordinate_batimenta(request):
             bat_bri.append(bat.pk) 
             bat.delete()
             print('polo')
-        if bat.koordinate_set.filter(brisanje=True):
-            #print('ooooooo',bat.koordinate_set.filter(brisanje=True)[0].x, bat.koordinate_set.filter(brisanje=True)[1].x)
+        if bat.koordinate_set.filter(brisanje=True).count()>0:
+            print('333, ',bat.koordinate_set.filter(brisanje=True).count())
+            print('ooooooo',bat.koordinate_set.filter(brisanje=True)[0].x) #, bat.koordinate_set.filter(brisanje=True)[1].x)
             koo_bri = bat.koordinate_set.filter(brisanje=True
                                                 ).order_by('-pk')[0]###
             print('lolololo')
             if stare_koordinate.pk < koo_bri.pk:
+                print('09999')
                 print('stare: ',stare_koordinate.pk, '   koordinate ob brisanju: ',koo_bri.pk,'  brisanjeeeeeeeeeee')
                 bat_bri.append(bat.pk)
                 bat.delete() 
@@ -293,7 +298,7 @@ def nazaj(request):
     trenutna_poteza = zgodovina_mreze.get(aktivna=True)
     #batiment na potezi kjer je kazalec
     bat=trenutna_poteza.batiment
-    print('poteza z batimentom: ',bat.pk)
+    #print('poteza z batimentom: ',bat.pk)
     try:
         #najdi predhodne koordinate tega batimenta
         #na [0] so trenutne koordinate batimenta, na [1] so koordinate ene poteze prej
@@ -303,7 +308,7 @@ def nazaj(request):
                                 ).order_by('-pk')[1]
         print(povrni)       
         if bat.viden == False:
-            print('pokazi zbrisan batiment', bat)
+            #print('pokazi zbrisan batiment', bat)
             bat.viden = True
             bat.save()
             response=serializers.serialize('json', [povrni,])
@@ -315,7 +320,7 @@ def nazaj(request):
             print(povrni)
         else:
             #1
-            print('premakni batiment na prejsnjo pozicijo', bat)
+            #print('premakni batiment na prejsnjo pozicijo', bat)
             response=serializers.serialize('json', [povrni,])
         print('eee')
 
@@ -327,7 +332,7 @@ def nazaj(request):
         bat.save()
         print('exception')
         response=serializers.serialize('json', [bat,])
-        print(response)
+        #print(response)
         response=json.loads(response)
         response.append('x')
         response=json.dumps(response, cls=DjangoJSONEncoder)
@@ -346,7 +351,7 @@ def nazaj(request):
     poteza_nazaj.aktivna=True
     trenutna_poteza.save()
     poteza_nazaj.save()    
-    print(response)
+    #print(response)
     return HttpResponse(response)
 
 @login_required
@@ -368,7 +373,7 @@ def naprej(request):
     response=json.loads(response)
     response.append(str(batiment_viden).lower())
     response=json.dumps(response, cls=DjangoJSONEncoder)
-    print(response)
+    #print(response)
     return HttpResponse(response)    
 
 @login_required
