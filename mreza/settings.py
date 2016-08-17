@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'registration',
     'mreza',
+    'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (
